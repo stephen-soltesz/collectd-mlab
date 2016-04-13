@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-The mlab, collectd-python plugin for VServer and M-Lab experiment monitoring.
+"""The mlab, collectd-python plugin for VServer and M-Lab experiment monitoring.
 
 Regard this file as a plugin rather than a standard python module. It is a
 plugin because it should only execute within the collectd runtime environment.
@@ -244,6 +243,7 @@ def meta_timer(type_instance):
 
   Args:
     type_instance: str, the name of the meta timer type.
+
   Returns:
     callable, a function decorator.
   """
@@ -294,6 +294,7 @@ def get_self_stats(stat_path):
 
   Args:
     stat_path: str, path to proc/<pid>/stat file.
+
   Returns:
     dict, with 'utime', 'stime', 'vsize', 'rss' key/values from stat file.
   """
@@ -433,6 +434,7 @@ def split_network_line(line):
 
   Args:
     line: str, a line of text from cacct file.
+
   Returns:
     4-tuple of int: representing
         ('recv' syscalls, received octets, 'send' syscalls, sent octets).
@@ -546,6 +548,7 @@ def read_vsys_data(command, version):
   Args:
     command: str, name of script or command to execute in vsys backend.
     version: int, expected version of backend response.
+
   Returns:
     dict, results of 'command'.
   """
@@ -579,6 +582,7 @@ def read_vsys_data_direct(command):
 
   Args:
     command: str, name of vsys backend command to run.
+
   Returns:
     dict, result of command.
   """
@@ -655,7 +659,7 @@ class VsysFrontend(object):
   the Vsys "frontend", and the process in the host context is the Vsys
   "backend." The frontend and backend processes communicate through two named
   pipes (FIFO files) in the slice filesystem.
-  
+
   Vsys FIFO files are located in /vsys/. For a single backend, the FIFOs are
   named /vsys/<backend>.in and /vsys/<backend>.out.
 
@@ -704,6 +708,7 @@ class VsysFrontend(object):
     Args:
       backend: str, vsys backend name.
       open_nonblock: bool, whether to open FIFOs nonblocking. Only for testing.
+
     Raises:
       VsysCreateException when the FIFOs for backend are not found.
     """
@@ -744,8 +749,10 @@ class VsysFrontend(object):
     Args:
       message: str, the complete message to send to backend.
       timeout: int, maximum time to wait for reply, in seconds.
+
     Returns:
       str, the complete response from backend.
+
     Raises:
       VsysException, if timeout occurs or premature EOF received from backend.
     """
@@ -760,8 +767,10 @@ class VsysFrontend(object):
     Args:
       path: str, path to a vsys FIFO.
       flags: int, flags to use when opening path with os.open.
+
     Returns:
       int, file descriptor for FIFO.
+
     Raises:
       VsysOpenException, if opening path fails.
     """
@@ -784,8 +793,10 @@ class VsysFrontend(object):
 
     Args:
       message: str, the message to send to backend.
+
     Returns:
       int, number of bytes written.
+
     Raises:
       VsysException, if an error occurs during write or the vsys frontend is
           not open.
@@ -802,8 +813,10 @@ class VsysFrontend(object):
 
     Args:
       timeout: int, maximum time to wait for reply, in seconds.
+
     Returns:
       str, the complete vsys response minus terminating newline.
+
     Raises:
       VsysException, if timeout occurs, premature EOF is read from backend or
           other IO error.
@@ -851,8 +864,10 @@ def slicename_to_hostname(vs_name):
     If vs_name is 'mlab_utility' and the system hostname is
     'mlab4.nuq01.measurement-lab.org', then slicename_to_hostname will return
     'utility.mlab.mlab4.nuq01.measurement-lab.org'.
+
   Args:
     vs_name: str, name of a vserver slice, e.g. mlab_utility.
+
   Returns:
     str, the canonical FQDN based on system hostname and slice name.
   """
@@ -906,12 +921,12 @@ def plugin_read(unused_input_data=None):
 def parse_config(config, depth=0):
   """Parses collectd configuration given to 'configure' handler.
 
-  Also saves ExcludeSlice settings in global _config_exclude_slices.
+  Configuration is a recursive structure, and parse_config calls itself. Also,
+  parse_config saves ExcludeSlice settings in global _config_exclude_slices.
 
   Args:
-    depth: int, used for padding in logging. Config is a nested structure,
-        and parse_config is called recursively. Depth tracks how far the
-        recursion has progressed.
+    config: collectd.Config, configuration data.
+    depth: int, used for padding in logging.
   """
   padding = '  ' * depth
   if config.key == 'ExcludeSlice':
