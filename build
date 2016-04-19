@@ -20,4 +20,5 @@ pyflakes . &&
 
 # Run the docstring lint checker.
 PYTHONPATH=$PYTHONPATH:$PWD/third_party/docstringchecker pylint \
-    --reports=n plugin/*.py export/*.py monitoring/*.py system/vsys/*.py site-packages/mlab/disco/*.py viewer/*.py
+    --reports=n plugin/*.py export/*.py monitoring/*.py system/vsys/*.py \
+	site-packages/mlab/disco/*.py viewer/*.py
