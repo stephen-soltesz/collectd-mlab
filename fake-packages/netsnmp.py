@@ -1,4 +1,10 @@
-"""A fake minimal version of netsnmp module."""
+"""A fake minimal version of netsnmp module.
+
+This module should only be used to work around a limitation of the travis-ci
+test environment.
+
+For more information on appropriate use cases see: fake-packages/README.md
+"""
 
 
 class Session(object):

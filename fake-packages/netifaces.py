@@ -1,4 +1,10 @@
-"""A fake minimal version of netifaces module."""
+"""A fake minimal version of netifaces module.
+
+This module should only be used to work around a limitation of the travis-ci
+test environment.
+
+For more information on appropriate use cases see: fake-packages/README.md
+"""
 
 AF_INET = 2
 AF_LINK = 17
