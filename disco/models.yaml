@@ -1,0 +1,82 @@
+# Switch model and OID configuration for collecting switch traffic.
+#
+# This configuration should contain two top level nodes for 'models' and 'oids'.
+
+# Model configuration.
+#
+# Each key is the canonical name of a switch model and should contain two
+# subvalues: 'pattern' and 'qbridge'. The 'pattern' value should be a substring
+# that is uniquely present in the sysDescr.0 OID; this is how models are
+# identified. The 'qbridge' value should be True for switches that support the
+# Q-BRIDGE MIB, and False otherwise.
+
+# Canonical names for switch models.
+models:
+    # HP ProCurve 28xx series.
+    procurve:
+        pattern: ProCurve
+        qbridge: true
+
+    # Juniper QFX.
+    qfx:
+        pattern: qfx
+        qbridge: true
+
+    # All known Cisco models.
+    cisco:
+        pattern: Cisco
+        qbridge: false
+
+
+# OID configuration.
+#
+# All switch models not otherwise declared below will use the 'default'
+# configuration. Specific models inherit the default configuration and may
+# declare partial OIDs that will override the corresponding default OIDs.
+#
+# Symbolic names must be recognized by the collectd-snmp plugin. Numeric OIDs
+# will always work.
+#
+# Switch model names must match the models defined above.
+
+oids:
+
+    # Default OID configuration for switch traffic utilization.
+    default:
+        # 64-bit eXtended counters.
+        # See also: IfXEntry http://www.ietf.org/rfc/rfc1573.txt
+        octets:
+            in: IF-MIB::ifHCInOctets.{ifIndex}
+            out: IF-MIB::ifHCOutOctets.{ifIndex}
+
+        unicast:
+            in: IF-MIB::ifHCInUcastPkts.{ifIndex}
+            out: IF-MIB::ifHCOutUcastPkts.{ifIndex}
+
+        multicast:
+            in: IF-MIB::ifHCInMulticastPkts.{ifIndex}
+            out: IF-MIB::ifHCOutMulticastPkts.{ifIndex}
+
+        broadcast:
+            in: IF-MIB::ifHCInBroadcastPkts.{ifIndex}
+            out: IF-MIB::ifHCOutBroadcastPkts.{ifIndex}
+
+        # 32-bit counters.
+        # See also: IfEntry http://www.ietf.org/rfc/rfc1213.txt
+        discards:
+            in: RFC1213-MIB::ifInDiscards.{ifIndex}
+            out: RFC1213-MIB::ifOutDiscards.{ifIndex}
+
+        errors:
+            in: RFC1213-MIB::ifInErrors.{ifIndex}
+            out: RFC1213-MIB::ifOutErrors.{ifIndex}
+
+
+    # Juniper QFX OID configuration differences from the default.
+    qfx:
+        discards:
+            # The Juniper QFX switch uses standard OIDs for monitoring except for a
+            # 64-bit, vendor MIB for output discards. The symbolic MIB is unknown
+            # to the library used by collectd-snmp, so use dot notation.  Symbolic:
+            # JUNIPER-COS-MIB::jnxCosQstatTotalDropPkts.${jnxCosQstatIfIndex}.0
+            out: .1.3.6.1.4.1.2636.3.15.4.1.53.{ifIndex}.0
