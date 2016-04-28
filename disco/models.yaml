@@ -57,9 +57,9 @@ models:
 # they define some model-specific 'oids' in the model declaration above. The
 # 'default_oids' value is a mapping from short names (e.g. 'octets') to 'oid'
 # types. Every OID should contain two values: 'rx' and 'tx'. These are a pair
-# of OID *formats strings* that represent the in-bound (receiving) and
+# of OID *format strings* that represent the in-bound (receiving) and
 # out-bound (transmitting) counters for an interface. When formatting the 'rx'
-# and 'tx' values the '{ifIndex}' is replaced with the corresponding switch
+# and 'tx' values, the '{ifIndex}' is replaced with the corresponding switch
 # port interface index number. For example:
 #
 #     octets.rx: IF-MIB::ifHCInOctets.{ifIndex}
