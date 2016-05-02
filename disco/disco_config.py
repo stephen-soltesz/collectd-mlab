@@ -14,7 +14,7 @@
 
   On success, update-snmp-community outputs to stdout a new <community> string
   with a VLAN-specific suffix, if needed.
-  
+
   On success, collectd-snmp-config outputs to stdout a collectd-snmp plugin
   configuration for the for the local and uplink switch ports of the local
   switch model.
@@ -125,6 +125,7 @@ def update_snmp_community(discover_session, hostname, switch_config, community):
         discover_session: discovery.DiscoverySession, the session used to
             discover local and uplink ports.
         hostname: str, switch hostname.
+        switch_config: models.Config, the switch configuration object.
         community: str, the SNMP community string.
 
     Returns:
