@@ -183,10 +183,6 @@ chkconfig rsyslog on
 chkconfig collectd on
 chkconfig collectd-setup on
 
-# TODO(soltesz): fix mlab_export.py to handle initial conditions correctly.
-# Initialize the lastexport timestamp file to one hour ago.
-touch -t $( date +%Y%m%d%H00 -d "-1 hour" ) /var/lib/collectd/lastexport.tstamp
-
 # TODO(soltesz): what package should own this file?
 touch %{site_packages}/mlab/__init__.py
 
