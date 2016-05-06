@@ -87,7 +87,7 @@ install -D -m 644 plugin/types.db           %{buildroot}/usr/share/collectd-mlab
 install -D -m 644 plugin/mlab.py            %{buildroot}/var/lib/collectd/python/mlab_vs.py
 
 # Init script.
-install -D -m 755 plugin/collectd-setup     %{buildroot}/etc/init.d/collectd-setup
+install -D -m 755 plugin/collectd_snmp_setup.sh     %{buildroot}/usr/bin/collectd_snmp_setup.sh
 
 # Python site-packages modules.
 install -d %{buildroot}/%{site_packages}/mlab/disco
@@ -150,7 +150,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/collectd-mlab/types.db
 
 # Init script.
-/etc/init.d/collectd-setup
+/etc/init.d/collectd_snmp_setup.sh
 
 # Python site-packages modules.
 %{site_packages}/mlab/disco/__init__.py
@@ -181,7 +181,6 @@ fi
 chkconfig crond on
 chkconfig rsyslog on
 chkconfig collectd on
-chkconfig collectd-setup on
 
 # TODO(soltesz): what package should own this file?
 touch %{site_packages}/mlab/__init__.py
@@ -195,7 +194,6 @@ if test -n "${DEVEL_ENVIRONMENT}" ; then
 
   service crond start
   service rsyslog start
-  service collectd-setup start
   service collectd start
 fi
 
