@@ -86,7 +86,7 @@ install -D -m 644 plugin/collectd-mlab.conf %{buildroot}/etc/collectd-mlab.conf
 install -D -m 644 plugin/types.db           %{buildroot}/usr/share/collectd-mlab/types.db
 install -D -m 644 plugin/mlab.py            %{buildroot}/var/lib/collectd/python/mlab_vs.py
 
-# Init script.
+# Setup SNMP collectd configuration.
 install -D -m 755 plugin/collectd_snmp_setup.sh     %{buildroot}/usr/bin/collectd_snmp_setup.sh
 
 # Python site-packages modules.
@@ -149,8 +149,8 @@ rm -rf $RPM_BUILD_ROOT
 /etc/collectd-mlab.conf
 /usr/share/collectd-mlab/types.db
 
-# Init script.
-/etc/init.d/collectd_snmp_setup.sh
+# Setup SNMP collectd configuration.
+/usr/bin/collectd_snmp_setup.sh
 
 # Python site-packages modules.
 %{site_packages}/mlab/disco/__init__.py
