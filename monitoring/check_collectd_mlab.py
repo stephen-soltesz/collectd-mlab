@@ -64,11 +64,15 @@ COLLECTD_UNIXSOCK = '/vservers/%s/var/run/collectd-unixsock' % SLICENAME
 LD_LIBRARY_PATH = '/vservers/%s/usr/lib' % SLICENAME
 
 HOSTNAME = socket.gethostname()
-SWITCHNAME = 's1.' + '.'.join(HOSTNAME.split('.')[1:])
 VSYSPATH_ACL = '/vsys/vs_resource_backend.acl'
 VSYSPATH_BACKEND = '/vsys/vs_resource_backend'
 VSYSPATH_SLICE = '/vservers/%s/vsys/vs_resource_backend.in' % SLICENAME
 DEFAULT_TIMEOUT = 60
+
+# Switch and SNMP constants.
+SNMP_COMMUNITY = '/vservers/%s/home/%s/conf/snmp.community' % (SLICENAME,
+                                                               SLICENAME)
+SWITCHNAME = 's1.' + '.'.join(HOSTNAME.split('.')[1:])
 
 # Canonical, nagios exit codes.
 STATE_OK = 0
@@ -110,6 +114,16 @@ class MissingBinaryError(CriticalError):
 
 class MissingNagiosBinaryError(CriticalError):
     """The collectd-nagios binary is missing."""
+    pass
+
+
+class MissingSNMPCommunityError(CriticalError):
+    """The snmp.community file is missing."""
+    pass
+
+
+class MissingUpdatedSNMPCommunityError(CriticalError):
+    """The snmp.community.updated file is missing."""
     pass
 
 
@@ -271,6 +285,19 @@ def assert_collectd_installed():
     if not os.path.exists(COLLECTD_UNIXSOCK):
         raise MissingSocketError('collectd unixsock not present: %s.',
                                  COLLECTD_UNIXSOCK)
+
+    # Is the SNMP community string installed?
+    if not (os.path.exists(SNMP_COMMUNITY) and
+            os.stat(SNMP_COMMUNITY).st_size > 0):
+        raise MissingSNMPCommunityError(
+            'Collectd snmp.community not found: %s.', SNMP_COMMUNITY)
+
+    # Is the *updated* SNMP community string installed?
+    if not (os.path.exists(SNMP_COMMUNITY + '.updated') and
+            os.stat(SNMP_COMMUNITY + '.updated').st_size > 0):
+        raise MissingUpdatedSNMPCommunityError(
+            'Collectd snmp.community.updated not found: %s.updated',
+            SNMP_COMMUNITY)
 
 
 def assert_collectd_responds():
