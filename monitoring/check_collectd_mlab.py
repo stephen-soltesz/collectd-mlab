@@ -64,6 +64,7 @@ COLLECTD_UNIXSOCK = '/vservers/%s/var/run/collectd-unixsock' % SLICENAME
 LD_LIBRARY_PATH = '/vservers/%s/usr/lib' % SLICENAME
 
 HOSTNAME = socket.gethostname()
+SWITCHNAME = 's1.' + '.'.join(HOSTNAME.split('.')[1:])
 VSYSPATH_ACL = '/vsys/vs_resource_backend.acl'
 VSYSPATH_BACKEND = '/vsys/vs_resource_backend'
 VSYSPATH_SLICE = '/vservers/%s/vsys/vs_resource_backend.in' % SLICENAME
@@ -372,6 +373,8 @@ def assert_collectd_nagios_levels():
       NagiosStateError, if an error occurs.
     """
     # TODO: Make warning & critical thresholds configurable.
+    # See: https://collectd.org/documentation/manpages/collectd-nagios.1.shtml
+    # for a description of the range specifiation.
 
     # Is utility slice quota ok?
     exit_code = run_collectd_nagios('utility.mlab.' + HOSTNAME,
@@ -399,6 +402,14 @@ def assert_collectd_nagios_levels():
                                     '0:100')
     if exit_code != 0:
         raise NagiosStateError('Collectd mlab plugin taking too long to run',
+                               exit_code)
+
+    # Is DISCO collecting data? This does not check the values, only that they
+    # are collected.
+    exit_code = run_collectd_nagios(SWITCHNAME, 'snmp/ifx_discards-local', 'tx',
+                                    '@~:-1', '@~:-1')
+    if exit_code != 0:
+        raise NagiosStateError('Collectd mlab plugin not collecting SNMP data.',
                                exit_code)
 
 

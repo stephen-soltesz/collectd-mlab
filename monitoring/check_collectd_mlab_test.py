@@ -196,7 +196,8 @@ class MLabNagiosTests(unittest.TestCase):
     @mock.patch('check_collectd_mlab.run_collectd_nagios')
     def testcover_assert_collectd_nagios_levels(self, mock_run_collectd_nagios):
         # This is not ideal. But, it's just a coverage test.
-        # Non-zero values cause a failue. Cause each call to to fail in sequence.
+        # Non-zero values cause a failue. Cause each call to to fail in
+        # sequence.
         mock_run_collectd_nagios.side_effect = [1]
         with self.assertRaises(check_collectd_mlab.NagiosStateError):
             check_collectd_mlab.assert_collectd_nagios_levels()
@@ -210,6 +211,10 @@ class MLabNagiosTests(unittest.TestCase):
             check_collectd_mlab.assert_collectd_nagios_levels()
 
         mock_run_collectd_nagios.side_effect = [0, 0, 0, 1]
+        with self.assertRaises(check_collectd_mlab.NagiosStateError):
+            check_collectd_mlab.assert_collectd_nagios_levels()
+
+        mock_run_collectd_nagios.side_effect = [0, 0, 0, 0, 1]
         with self.assertRaises(check_collectd_mlab.NagiosStateError):
             check_collectd_mlab.assert_collectd_nagios_levels()
 
