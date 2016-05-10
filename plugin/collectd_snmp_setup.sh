@@ -43,6 +43,7 @@ else
                || ! diff -q "${COLLECTD_SNMP}.tmp" "${COLLECTD_SNMP}" ; then
                # Update the configuration.
                mv "${COLLECTD_SNMP}.tmp" "${COLLECTD_SNMP}"
+           fi
         fi
     fi
 fi
