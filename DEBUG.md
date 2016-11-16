@@ -1,13 +1,27 @@
 # Debugging Disco Auto-discovery
 
-## QFX and HP Proliant
+Login to the `mlab_utility` slice at the site of your choice and setup some
+convenience variables.
 
-Login to the `mlab_utility` slice at the site of your choice.
 ```
 ssh mlab_utility@mlab1.{site}.measurement-lab.org
 COMM=`cat /home/mlab_utility/conf/snmp.community.updated`
 SWITCH="s1.${HOSTNAME#*.}"
 ```
+
+## Running Disco config
+
+The `disco_config.py` command line tool should generate the contents for
+`/etc/collectd-snmp.conf`. Normally this is done every time `service collectd
+start` or `service collectd restart`, but the error output may be hidden.
+
+```
+disco_config.py --command collectd-snmp-config \
+    --community_file=/home/mlab_utility/conf/snmp.community \
+	--hostname $SWITCH
+```
+
+## QFX and HP Proliant
 
 Learn the switch model.
 ```
