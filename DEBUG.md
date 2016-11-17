@@ -21,7 +21,7 @@ disco_config.py --command collectd-snmp-config \
 	--hostname $SWITCH
 ```
 
-## QFX and HP Proliant
+## QFX and HP Procurve
 
 Learn the switch model.
 ```
@@ -33,12 +33,13 @@ Lookup the local machine MAC and uplink MAC addresses using `ifconfig` and
 `arp`. For example:
 
 ```
-$ ifconfig eth0 | grep HWaddr
-eth0      Link encap:Ethernet  HWaddr F4:52:14:13:33:F0
+$ ip link show eth0
+2: eth0: <BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 qdisc mq state UP qlen 1000
+    link/ether f4:52:14:13:33:f0 brd ff:ff:ff:ff:ff:ff
 
-$ arp
-Address                  HWtype  HWaddress           Flags Mask            Iface
-165.117.240.1            ether   00:12:c0:88:05:01   C                     eth0
+$ ip neighbor
+...
+165.117.240.1 dev eth0 lladdr 00:12:c0:88:05:01 DELAY
 ```
 
 Lookup the MAC addresses learned on each port using the
