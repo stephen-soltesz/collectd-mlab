@@ -9,7 +9,7 @@ COMM=`cat /home/mlab_utility/conf/snmp.community.updated`
 SWITCH="s1.${HOSTNAME#*.}"
 ```
 
-## Running Disco config
+## Running Disco config manually
 
 The `disco_config.py` command line tool should generate the contents for
 `/etc/collectd-snmp.conf`. Normally this is done every time `service collectd
@@ -18,8 +18,25 @@ start` or `service collectd restart`, but the error output may be hidden.
 ```
 disco_config.py --command collectd-snmp-config \
     --community_file=/home/mlab_utility/conf/snmp.community \
-	--hostname $SWITCH
+    --hostname $SWITCH
 ```
+
+## Updating Disco snmp.community manually
+
+For Cisco switches, the `disco_config.py` command line tool should be able to
+discover the VLAN associated with the current server and update the snmp
+community string accordingly.
+
+```
+disco_config.py --command update-snmp-community \
+    --community_file=/home/mlab_utility/conf/snmp.community \
+    --hostname $SWITCH
+```
+
+The output from this command should be saved to
+`/home/mlab_utility/conf/snmp.community.updated`. If the output does not match
+the content of this file (or, the file is empty) there may be an error
+discovering VLANs.
 
 ## QFX and HP Procurve
 
@@ -101,3 +118,46 @@ $ snmpwalk -v 2c -c $COMM $SWITCH .1.3.6.1.2.1.17.7.1.4.3.1.1
 ```
 
 ## Cisco
+
+Cisco switches segregate SNMP data per VLAN. SNMP data for each vlan is
+accessed via a modified SNMP community string. The SNMP community string is
+modified by appending `@<vlanid>` to the end.
+
+So, Disco must first discover which VLAN contains the M-Lab servers. Disco does
+this using the CISCO-VTP-MIB vtpVlanIfIndex (.1.3.6.1.4.1.9.9.46.1.3.1.1.18) to
+list all VLANs on the switch, followed by sequentially trying a new community
+string based each VLAN to auto discover the switch ports.
+
+To list the VLANs on a Cisco switch:
+
+```
+VLANID=$( snmpwalk -v 2c -c `cat /home/mlab_utility/conf/snmp.community` \
+          s1.${HOSTNAME#*.} .1.3.6.1.4.1.9.9.46.1.3.1.1.18 \
+          | grep -vE '1$|0$' | awk '{print $4}' )
+echo `cat /home/mlab_utility/conf/snmp.community`@$VLANID \
+    > /home/mlab_utility/conf/snmp.community.updated
+```
+
+Ignore VLANs with id zero (0). VLAN 1 is the default VLAN. All others are
+candidates. The above command assumes there is only *one* other VLAN, so it may
+fail for systems with multiple. Disco should handle multiple VLANs
+automatically.
+
+As for other switches, we lookup the MAC addresses learned on each port. Though
+for Cisco switches, we must use the BRIDGE-MIB::dot1dTpFdbPort OID.
+
+```
+# snmpwalk -v 2c -c ${COMM}@$VLANID $SWITCH .1.3.6.1.2.1.17.4.3.1.2
+SNMPv2-SMI::mib-2.17.4.3.1.2.116.142.248.247.212.125 = INTEGER: 25
+SNMPv2-SMI::mib-2.17.4.3.1.2.144.177.28.53.21.90 = INTEGER: 13
+SNMPv2-SMI::mib-2.17.4.3.1.2.144.177.28.53.21.92 = INTEGER: 15
+SNMPv2-SMI::mib-2.17.4.3.1.2.144.177.28.53.22.127 = INTEGER: 5
+SNMPv2-SMI::mib-2.17.4.3.1.2.144.177.28.53.22.129 = INTEGER: 7
+SNMPv2-SMI::mib-2.17.4.3.1.2.144.177.28.53.35.117 = INTEGER: 1
+SNMPv2-SMI::mib-2.17.4.3.1.2.144.177.28.53.35.119 = INTEGER: 3
+SNMPv2-SMI::mib-2.17.4.3.1.2.204.78.36.29.129.0 = INTEGER: 25
+```
+
+After identifying the correct MAC addresses corresponding to the uplink and
+local server ports, the steps to identify the ifIndex remain the same for all
+switches.
