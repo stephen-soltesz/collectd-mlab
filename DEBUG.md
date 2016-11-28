@@ -36,8 +36,9 @@ disco_config.py --command update-snmp-community \
 The output from this command should be saved to
 `/home/mlab_utility/conf/snmp.community.updated`. If the output does not match
 the content of this file (or, the file is empty) there may be an error
-discovering VLANs. See the Cisco notes below for Cisco switches. For other
-switch types, see the command for querying `sysDescr.0` below.
+discovering VLANs. To diagnose Cisco switches, see the Cisco notes below. To
+diagnose other switch types, start with the commands for querying `sysDescr.0`
+below.
 
 ## QFX and HP Procurve
 
