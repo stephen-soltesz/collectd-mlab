@@ -36,7 +36,8 @@ disco_config.py --command update-snmp-community \
 The output from this command should be saved to
 `/home/mlab_utility/conf/snmp.community.updated`. If the output does not match
 the content of this file (or, the file is empty) there may be an error
-discovering VLANs.
+discovering VLANs. See the Cisco notes below for Cisco switches. For other
+switch types, see the command for querying `sysDescr.0` below.
 
 ## QFX and HP Procurve
 
@@ -121,7 +122,9 @@ $ snmpwalk -v 2c -c $COMM $SWITCH .1.3.6.1.2.1.17.7.1.4.3.1.1
 
 Cisco switches segregate SNMP data per VLAN. SNMP data for each vlan is
 accessed via a modified SNMP community string. The SNMP community string is
-modified by appending `@<vlanid>` to the end.
+modified by appending `@<vlanid>` to the end. For example, if the community
+string is "banana" and the VLAN id is 102, then the modified community string
+would be "banana@102"
 
 So, Disco must first discover which VLAN contains the M-Lab servers. Disco does
 this using the CISCO-VTP-MIB vtpVlanIfIndex (.1.3.6.1.4.1.9.9.46.1.3.1.1.18) to
@@ -138,10 +141,10 @@ echo `cat /home/mlab_utility/conf/snmp.community`@$VLANID \
     > /home/mlab_utility/conf/snmp.community.updated
 ```
 
-Ignore VLANs with id zero (0). VLAN 1 is the default VLAN. All others are
-candidates. The above command assumes there is only *one* other VLAN, so it may
-fail for systems with multiple. Disco should handle multiple VLANs
-automatically.
+Disco handles multiple VLANs automatically. The above command does not because
+it assumes there is only *one* additional VLAN. The command above ignores VLANs
+with id zero (0) and VLAN one (1). VLAN 1 is the default VLAN. All other
+non-0 and non-1 VLANs are candidates.
 
 As for other switches, we lookup the MAC addresses learned on each port. Though
 for Cisco switches, we must use the BRIDGE-MIB::dot1dTpFdbPort OID.
